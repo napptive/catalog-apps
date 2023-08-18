@@ -1,0 +1,25 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: tensorflow
+  annotations:
+    version: nightly-jupyter
+    description: "TensorFlow Application"
+spec:
+  components:
+    - name: tensorflow
+      type: webservice
+      properties:
+        image: tensorflow/tensorflow:nightly-jupyter
+        ports:
+          - port: 8888
+            expose: true
+        memory: "1Gi"
+        cpu: "500m"
+      traits:
+        - type: napptive-ingress         
+          properties:
+            name: tensorflow
+            port: 8888
+            path: /
+            requestBodySize: 64m

@@ -1,0 +1,15 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Apache NiFi"
+version: 1.13.2
+description: NiFi automates the flow of data between systems
+keywords:
+  - "dataflow"
+  - "data"
+license: "Apache License Version 2.0"
+url: "https://nifi.apache.org"
+doc: "https://nifi.apache.org/docs.html"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/apache-nifi-logo.svg"
+    type: "image/svg"
+    size: "114x150"

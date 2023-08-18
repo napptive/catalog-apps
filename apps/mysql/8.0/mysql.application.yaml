@@ -1,0 +1,26 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: mysql
+  annotations:
+    version: "8.0"
+    description: "Customized version of mysql with persistent data"
+spec:
+  components:
+    - name: mysql
+      type: webservice
+      properties:
+        image: mysql:8.0
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+        - port: 3306
+          expose: true
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        volumeMounts:
+          pvc:
+          - name: data
+            mountPath: "/var/lib/mysql"
+            claimName: "pvc"

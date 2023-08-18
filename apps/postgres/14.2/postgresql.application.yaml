@@ -1,0 +1,32 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: postgresql
+  annotations:
+    version: v1.0.0
+    description: "Postgres Database"
+spec:
+  components:
+    - name: postgres
+      type: webservice
+      properties:
+        image: postgres:14.2
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+        - port: 5432
+          expose: true
+        env:
+        - name: POSTGRES_DB
+          value: "postgresdb"
+        - name: POSTGRES_USER
+          value: "admin"
+        - name: POSTGRES_PASSWORD
+          value: "admin"
+        - name: PGDATA
+          value: "/var/lib/postgresql/data/pgdata"
+        volumeMounts:
+          emptyDir:
+          - name: data
+            mountPath: "/var/lib/postgresql/data"
+            medium: ""

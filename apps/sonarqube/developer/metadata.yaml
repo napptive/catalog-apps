@@ -1,0 +1,15 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "sonarqube"
+version: developer
+description: sonarqube. Automatic code review tool
+keywords:
+  - "code"
+  - "QA"
+license: "Apache License Version 2.0"
+url: "https://docs.sonarqube.org/"
+doc: "https://docs.sonarqube.org/"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/sonarqube-logo.svg"
+    type: "image/svg"
+    size: "256x128"

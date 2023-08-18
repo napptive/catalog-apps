@@ -1,0 +1,27 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: mysql
+  annotations:
+    version: "5.7"
+    description: "Customized version of mysql with epheral storage"
+spec:
+  components:
+    - name: mysql
+      type: webservice
+      properties:
+        image: mysql:5.7
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+        - port: 3306
+          expose: true
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        volumeMounts:
+          emptyDir:
+          - name: data          
+            medium: ""        
+            mountPath: "/var/lib/mysql"
+          

@@ -1,0 +1,24 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: sonarqube
+  annotations:
+    version: latest
+    description: "sonarqube. Automatic code review tool"
+spec:
+  components:
+    - name: sonarqube
+      type: webservice
+      properties:
+        image: sonarqube:developer
+        cpu: "500m" 
+        memory: 1Gi
+        ports:
+          - port: 9000
+            expose: true
+      traits:
+        - type: napptive-ingress         
+          properties:
+            name: sonarqube
+            port: 9000
+            path: /

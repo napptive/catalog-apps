@@ -1,0 +1,26 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: drawio
+  annotations:
+    version: 17.2.4
+    description: "draw.io (formerly Diagramly) is free online diagram software"
+spec:
+  components:
+    - name: drawio
+      type: webservice
+      properties:
+        image: jgraph/drawio:17.2.4
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+          - port: 8080
+            expose: true
+          - port: 8443
+            expose: false
+      traits:
+        - type: napptive-ingress         
+          properties:
+            name: drawio
+            port: 8080
+            path: /

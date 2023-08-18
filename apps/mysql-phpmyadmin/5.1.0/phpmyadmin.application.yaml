@@ -1,0 +1,40 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: phpmyadmin-mysql
+  annotations:
+    version: "5.7"
+    description: "Customized version of phpmyadmin-mysql"
+spec:
+  components:
+  - name: mysql
+    type: webservice
+    properties:
+      image:   mysql:5.7
+      cpu: "150m" 
+      memory: 256Mi
+      ports:
+      - port: 3306
+        expose: true
+      env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: "root"
+  - name: phpmyadmin
+    type: webservice
+    properties:
+      image: phpmyadmin:5.1.0
+      cpu: "150m" 
+      memory: 256Mi
+      ports:
+      - port: 80
+        expose: true
+      env:
+      - name: PMA_HOST
+        value: "mysql"
+    traits:
+    - type: napptive-ingress         
+      properties:
+        name: phpmyadmin
+        port: 80
+        path: /
+

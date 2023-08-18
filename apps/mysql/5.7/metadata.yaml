@@ -1,0 +1,14 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Mysql"
+version: 5.7
+description: Mysql database.
+keywords:
+  - "database"
+license: "Apache License Version 2.0"
+url: "https://www.mysql.com/"
+doc: "https://dev.mysql.com/doc/"
+logo:
+  - src: "https://www.mysql.com/common/logos/logo-mysql-170x115.png"
+    type: "image/png"
+    size: "170x115"

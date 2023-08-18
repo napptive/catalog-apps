@@ -1,0 +1,15 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Gitea"
+version: 1.13.2
+description: Code hosting solution
+keywords:
+  - "diagrams"
+  - "uml"
+license: "MIT License"
+url: "https://gitea.io/"
+doc: "https://docs.gitea.io/"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/gitea.png"
+    type: "image/png"
+    size: "128x128"

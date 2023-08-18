@@ -1,0 +1,15 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Mysql-PHPMyAdmin"
+version: 5.1.0
+description: Mysql database with PHPMyAdmin.
+keywords:
+  - "database"
+  - "SQL"
+license: "Apache License Version 2.0"
+url: "https://www.phpmyadmin.net/"
+doc: "https://www.phpmyadmin.net/docs/"
+logo:
+  - src: "https://www.phpmyadmin.net/static/images/logo.png?067b638aa2a2"
+    type: "image/png"
+    size: "172x101"

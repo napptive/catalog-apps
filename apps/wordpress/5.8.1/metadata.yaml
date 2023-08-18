@@ -1,0 +1,15 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Wordpress"
+version: 5.8.1
+description: Open Source content management with Mysql database
+keywords:
+  - "wordpress"
+  - "mysql"
+license: "Apache License Version 2.0"
+url: "https://hub.docker.com/r/bitnami/wordpress"
+doc: "https://wordpress.com/"
+logo:
+  - src: "https://s.w.org/style/images/about/WordPress-logotype-simplified.png"
+    type: "image/png"
+    size: "500x500"

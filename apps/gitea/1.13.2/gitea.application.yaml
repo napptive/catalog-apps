@@ -1,0 +1,52 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: gitea-app
+  annotations:
+    version: 1.13.2
+    description: "Customized version of Gitea (A painless self-hosted Git service) with postgres"
+spec:
+  components:
+  - name: postgres
+    type: webservice
+    properties:
+      image:  postgres:10.4
+      cpu: "150m" 
+      memory: 256Mi
+      ports:
+      - port: 5432
+        expose: true
+      env:
+      - name: POSTGRES_DB
+        value: "postgresdb"
+      - name: POSTGRES_USER
+        value: "postgresadmin"
+      - name: POSTGRES_PASSWORD
+        value: "admin123"
+  - name: gitea
+    type: webservice
+    properties:
+      image: gitea/gitea:1.13.2
+      cpu: "150m" 
+      memory: 256Mi
+      ports:
+      - port: 3000
+        expose: true
+      env:
+      - name: DB_TYPE
+        value: "postgres"
+      - name: DB_HOST
+        value: "postgres"
+      - name: DB_NAME
+        value: "postgresdb"
+      - name: DB_USER
+        value: "postgresadmin"
+      - name: DB_PASSWD
+        value: "admin123"
+    traits:
+    - type: napptive-ingress         
+      properties:
+        name: gitea
+        port: 3000
+        path: /
+

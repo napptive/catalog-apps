@@ -1,0 +1,16 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Excalidraw"
+version: sha-4bfc5bb
+description: Virtual whiteboard for sketching hand-drawn like diagrams
+keywords:
+  - "diagrams"
+  - "sketching"
+  - "hand-draw"
+license: "MIT License"
+url: "https://github.com/excalidraw/excalidraw"
+doc: "https://github.com/excalidraw/excalidraw#documentation"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/excalidraw.png"
+    type: "image/png"
+    size: "128x128"
