@@ -9,8 +9,10 @@ The repository structure uses directories to organize applications by their asso
 
 Where:
 
-* `application_name`:
-* `version`: 
+* `application_name`: The name of the application as it will be shown in the catalog. This is typically associated with
+the main component of the application.
+* `version`: The version as it will be shown in the catalog. In a multi-component application use the version associated
+with the image of the main component. Avoid when possible variable versions such as *latest*.
 
 ## Adding a new application
 
