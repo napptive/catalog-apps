@@ -1,0 +1,14 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Rstudio"
+version: 4.0.4
+description: RStudio
+keywords:
+  - "R"
+license: "AGPL v3"
+url: "https://www.rocker-project.org/"
+doc: "https://www.rocker-project.org/"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/rocker.png"
+    type: "image/png"
+    size: "700x700"

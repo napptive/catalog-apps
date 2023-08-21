@@ -1,0 +1,31 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: nifi
+  annotations:
+    version: v1.0.0
+    description: "Apache Nifi App"
+spec:
+  components:
+    - name: nifi
+      type: webservice
+      properties:
+        image: apache/nifi:1.13.2
+        cpu: "1" 
+        memory: 2Gi
+        ports:
+        - port: 8080
+          expose: true
+        - port: 8443
+          expose: true
+        env:
+        - name: SINGLE_USER_CREDENTIALS_USERNAME
+          value: "admin"
+        - name: SINGLE_USER_CREDENTIALS_PASSWORD
+          value: "admin"
+      traits:
+      - type: napptive-ingress         
+        properties:
+          name: nifi
+          port: 8080
+          path: /

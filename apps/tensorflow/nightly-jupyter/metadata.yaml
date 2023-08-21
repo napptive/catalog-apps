@@ -1,0 +1,15 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Tensorflow"
+version: nightly-jupyter
+description: Tensorflow
+keywords:
+  - "python"
+  - "machine learning"
+license: "Apache License Version 2.0"
+url: "https://www.tensorflow.org/"
+doc: "https://www.tensorflow.org/api_docs"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/tensorflow.Logo.png"
+    type: "image/png"
+    size: "32x32"

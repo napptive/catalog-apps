@@ -1,0 +1,10 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "Postgres"
+version: 14.2
+description: Postgres Database
+keywords:
+  - "database"
+license: "Apache License Version 2.0"
+url: "https://www.postgresql.org/"
+doc: "https://www.postgresql.org/docs/"

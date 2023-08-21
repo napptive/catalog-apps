@@ -1,0 +1,27 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: rstudio
+  annotations:
+    version: 4.0.4
+    description: "RStudio IDE for R"
+spec:
+  components:
+    - name: rstudio
+      type: webservice
+      properties:
+        image: rocker/rstudio:4.0.4
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+          - port: 8787
+            expose: true
+        env:
+          - name: PASSWORD
+            value: "password"
+      traits:
+        - type: napptive-ingress         
+          properties:
+            name: rstudio
+            port: 8787
+            path: /

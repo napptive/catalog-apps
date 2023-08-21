@@ -1,0 +1,18 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: redis
+  annotations:
+    version: 7.0.11
+    description: "A minimal Redis deployment for development purposes"
+spec:
+  components:
+    - name: redis-server
+      type: webservice
+      properties:
+        image: redis:7.0.11
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+          - port: 6379
+            expose: true

@@ -1,0 +1,24 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: excalidraw
+  annotations:
+    version: sha-4bfc5bb
+    description: "Excalidraw hand-drawing diagram sofware"
+spec:
+  components:
+    - name: excalidraw
+      type: webservice
+      properties:
+        image: excalidraw/excalidraw:sha-4bfc5bb
+        cpu: "150m" 
+        memory: 256Mi
+        ports:
+          - port: 80
+            expose: true
+      traits:
+        - type: napptive-ingress         
+          properties:
+            name: excalidraw
+            port: 80
+            path: /
