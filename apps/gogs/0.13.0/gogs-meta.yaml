@@ -1,0 +1,24 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+# Name of the application, not necessarily a valid k8s name.
+name: "GOGS - Self hosted Git"
+# Version of the application, typically related with the components versions.
+version: 1.0
+description: Self hosted Git service written in Go
+# Keywords facilitate searches on the catalog
+keywords:
+  - "git"
+  - "vcs"
+  - "gogs" 
+  - "infra"
+# Set the license based on the components that are deployed in an application.
+license: "Apache License Version 2.0"
+# URL and Doc entries with links to get more information on the application and its associated documentation.
+url: "https://gogs.io"
+doc: "https://gogs.io/docs"
+# The logo can be used as visual information when listing the catalog so the user
+# recognizes more easily the application. Avoid hotlinking images without permission.
+logo:
+  - src: "https://upload.wikimedia.org/wikipedia/commons/0/09/Gogs_logo.png"
+    type: "image/png"
+    size: "512x512"

@@ -1,0 +1,54 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application 
+metadata:
+  name: gogs-deployment
+spec:
+  components:
+    - name: gogs-configuration
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: gogs-config
+            data:
+              app.ini: |
+                RUN_MODE = prod
+                RUN_USER = git
+                BRAND_NAME = napptive-gogs
+
+                ; add more production configuration as required or leave as default
+
+    - name: gogs-webservice
+      type: webservice
+      properties:
+        image: nimish8/gogs
+        cpu: "50m"
+        env: 
+          - name: SOCAT_LINK
+            value: "false"
+        memory: "512M"
+        ports:
+          - port: 3000
+            expose: true
+      traits:
+        - type: napptive-ingress
+          properties:
+            name: gogs-ingress
+            port: 3000
+            path: /
+        - type: storage
+          properties:
+            pvc:
+              - name: data
+                mountPath: /data/
+                resources:
+                  requests:
+                    storage: 1Gi
+            configMap:
+              - name: gogs-config
+                mountPath: /configDir
+            # emptyDir
+            #   - name: data
+            #     mountPath: /data
