@@ -1,0 +1,620 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application 
+metadata:
+  name: taiga
+spec:
+  components:
+    - name: taiga-gateway 
+      type: webservice 
+      dependsOn:
+        - env-vars
+        - taiga-events
+        - taiga-back
+      properties: 
+        image: nginx:1.19-alpine
+        cpu: "100m"
+        memory: "512M"
+        ports: 
+          - port: 80
+            expose: true
+      traits: 
+        - type: napptive-ingress
+          properties:
+            name: taiga-ingress
+            port: 80 
+            path: /
+            writeURLToConfigMap: url-config
+        - type: storage
+          properties:
+            configMap:
+              - name: taiga-nginx
+                mountPath: /etc/nginx/conf.d/default.conf
+                subPath: default.conf
+    - name: env-vars
+      type: k8s-objects 
+      properties:
+        objects:
+          - apiVersion: v1 
+            kind: ConfigMap
+            metadata:
+              name: taiga-nginx
+            data: 
+              default.conf: | 
+                server {
+                    listen 80 default_server;
+
+                    client_max_body_size 100M;
+                    charset utf-8;
+
+                    # Frontend
+                    location / {
+                        proxy_pass http://taiga-front/;
+                        proxy_pass_header Server;
+                        proxy_set_header Host $http_host;
+                        proxy_redirect off;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        proxy_set_header X-Scheme $scheme;
+                    }
+
+                    # API
+                    location /api/ {
+                        proxy_pass http://taiga-back:8000/api/;
+                        proxy_pass_header Server;
+                        proxy_set_header Host $http_host;
+                        proxy_redirect off;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        proxy_set_header X-Scheme $scheme;
+                    }
+
+                    # Admin
+                    location /admin/ {
+                        proxy_pass http://taiga-back:8000/admin/;
+                        proxy_pass_header Server;
+                        proxy_set_header Host $http_host;
+                        proxy_redirect off;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        proxy_set_header X-Scheme $scheme;
+                    }
+
+                    # Static
+                    location /static/ {
+                        alias /taiga/static/;
+                    }
+
+                    # Media
+                    location /_protected/ {
+                        internal;
+                        alias /taiga/media/;
+                        add_header Content-disposition "attachment";
+                    }
+
+                    # Unprotected section
+                    location /media/exports/ {
+                        alias /taiga/media/exports/;
+                        add_header Content-disposition "attachment";
+                    }
+
+                    location /media/ {
+                        proxy_set_header Host $http_host;
+                        proxy_set_header X-Real-IP $remote_addr;
+                        proxy_set_header X-Scheme $scheme;
+                        proxy_set_header X-Forwarded-Proto $scheme;
+                        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                        proxy_pass http://taiga-protected:8003/;
+                        proxy_redirect off;
+                    }
+
+                    # Events
+                    location /events {
+                        proxy_pass http://taiga-events:8888/events;
+                        proxy_http_version 1.1;
+                        proxy_set_header Upgrade $http_upgrade;
+                        proxy_set_header Connection "upgrade";
+                        proxy_connect_timeout 7d;
+                        proxy_send_timeout 7d;
+                        proxy_read_timeout 7d;
+                    }
+                }
+          
+          - apiVersion: v1 
+            kind: Secret 
+            type: Opaque
+            metadata:
+              name: taiga-secret
+            stringData:
+              postgresPassword: taiga
+              postgresUser: taiga
+            data: 
+              rabbitmqPass: dGFpZ2EK
+              taigaSecretKey: c2VjcmV0LWtleQo=
+              erlangCookie: c2VjcmV0LWVybGFuZy1jb29raWUK
+          - apiVersion: v1 
+            kind: ConfigMap
+            metadata:
+              name: taiga-config
+            data:
+              postgresDb: taiga
+              postgresHost: taiga-db
+              rabbitmqUser: taiga
+              max_age: "360"
+              taigaSitesScheme: https
+              taigaSubpath: ""
+              rabbitmq_vhost: taiga
+              websocketsScheme: wss
+              publicRegisterEnabledFE: "true"
+              publicRegisterEnabledBE: "True"
+              defaultFromEmail: ""
+              emailBackend: django.core.mail.backends.console.EmailBackend
+              emailHost: ""
+              emailHostPassword: ""
+              emailHostUser: ""
+              emailPort: ""
+              emailUseSSL: ""
+              emailUseTLS: ""
+              enableTelemetry: "false"
+    - name: taiga-db
+      type: webservice
+      
+      properties:
+        image: postgres:12.3
+        cpu: "250m"
+        memory: "250M"
+        env:
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: postgresDb
+        ports: 
+          - port: 5432
+            expose: true
+      traits:
+        - type: service-binding 
+          properties:
+            envMappings:
+              POSTGRES_USER: 
+                secret: taiga-secret
+                key: postgresUser
+              POSTGRES_PASSWORD:
+                secret: taiga-secret
+                key: postgresPassword
+        - type: storage
+          properties:
+            pvc: 
+              - name: taiga-db-data 
+                mountPath: /var/lib/postgresql/data
+                subPath: taigaDB
+                resources:
+                  requests:
+                    storage: 1G
+    - name: taiga-async-rabbitmq
+      type: webservice 
+      properties:
+        image: rabbitmq:3.8-management-alpine
+        cpu: "250m"
+        memory: "512M"
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmqUser
+          - name: RABBITMQ_DEFAULT_VHOST
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmq_vhost
+        ports:
+          - port: 4369
+            expose: true
+          - port: 5671
+            expose: true
+          - port: 5672
+            expose: true
+          - port: 15671
+            expose: true
+          - port: 15672
+            expose: true
+          - port: 15691
+            expose: true
+          - port: 15692
+            expose: true
+          - port: 25672
+            expose: true
+      traits:
+        - type: service-binding 
+          properties:
+            envMappings:
+              RABBITMQ_ERLANG_COOKIE:
+                secret: taiga-secret
+                key: erlangCookie
+              RABBITMQ_DEFAULT_PASS:
+                secret: taiga-secret
+                key: rabbitmqPass
+        - type: storage 
+          properties:
+            pvc: 
+              - name: taiga-async-rabbitmq-data 
+                mountPath: /var/lib/rabbitmq
+                resources:
+                  requests:
+                    storage: 100Mi
+    - name: taiga-async
+      dependsOn:
+        - taiga-async-rabbitmq
+        - taiga-events-rabbitmq
+        - taiga-db
+      type: webservice 
+      properties: 
+        image: taigaio/taiga-back:latest
+        cpu: "250m"
+        memory: "1G"
+        cmd: ["/taiga-back/docker/async_entrypoint.sh"]
+        ports: 
+          - port: 8000
+            expose: true
+        env:
+          - name: TAIGA_SITES_SCHEME
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: taigaSitesScheme
+          - name: TAIGA_SITES_DOMAIN
+            valueFrom:
+              configMapKeyRef:
+                name: url-config
+                key: URL
+          - name: TAIGA_SUBPATH
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: taigaSubpath
+          - name: DEFAULT_FROM_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: defaultFromEmail
+          - name: EMAIL_BACKEND
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailBackend
+          - name: EMAIL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailHost
+          - name: EMAIL_HOST_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailHostPassword
+          - name: EMAIL_HOST_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailHostUser
+          - name: EMAIL_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailPort
+          - name: EMAIL_USE_SSL
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailUseSSL
+          - name: EMAIL_USE_TLS
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailUseTLS
+          - name: ENABLE_TELEMETRY
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: enableTelemetry
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: postgresDb
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: postgresHost
+          - name: RABBITMQ_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmqUser
+      traits:
+        - type: service-binding 
+          properties:
+            envMappings:
+              POSTGRES_USER:  
+                secret: taiga-secret
+                key: postgresUser
+              TAIGA_SECRET_KEY:
+                secret: taiga-secret
+                key: taigaSecretKey
+              RABBITMQ_PASS: 
+                secret: taiga-secret
+                key: rabbitmqPass
+              POSTGRES_PASSWORD:
+                secret: taiga-secret
+                key: postgresPassword
+        - type: storage 
+          properties:
+            pvc: 
+              - name: taiga-static-data
+                mountPath: /taiga-back/static
+                resources:
+                  requests:
+                    storage: 100Mi
+              - name: taiga-media-data
+                mountPath: /taiga-back/media
+                resources:
+                  requests:
+                    storage: 100Mi
+    - name: taiga-back
+      type: webservice
+      dependsOn:
+        - taiga-db
+        - taiga-events-rabbitmq
+        - taiga-async-rabbitmq
+      properties:
+        image: taigaio/taiga-back:latest 
+        cpu: "250m"
+        memory: "2Gi"
+        cmd: ["/bin/bash",  "-c", "sed -i 's/--workers 3/--workers 2/g' /taiga-back/docker/entrypoint.sh && /taiga-back/docker/entrypoint.sh"]
+        ports: 
+          - port: 8000
+            expose: true
+        env: 
+          - name: PUBLIC_REGISTER_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: publicRegisterEnabledBE
+          - name: DEFAULT_FROM_EMAIL
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: defaultFromEmail
+          - name: EMAIL_BACKEND
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailBackend
+          - name: EMAIL_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailHost
+          - name: EMAIL_HOST_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailHostPassword
+          - name: EMAIL_HOST_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailHostUser
+          - name: EMAIL_PORT
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailPort
+          - name: EMAIL_USE_SSL
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailUseSSL
+          - name: EMAIL_USE_TLS
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: emailUseTLS
+          - name: ENABLE_TELEMETRY
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: enableTelemetry
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: postgresDb
+          - name: POSTGRES_HOST
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: postgresHost
+          - name: RABBITMQ_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmqUser
+          - name: TAIGA_SITES_SCHEME
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: taigaSitesScheme 
+          - name: TAIGA_SUBPATH
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: taigaSubpath
+      traits:
+        - type: service-binding
+          properties:
+            envMappings:
+              POSTGRES_USER: 
+                secret: taiga-secret
+                key: postgresUser
+              TAIGA_SECRET_KEY:
+                secret: taiga-secret
+                key: taigaSecretKey
+              RABBITMQ_PASS:
+                secret: taiga-secret
+                key: rabbitmqPass
+              POSTGRES_PASSWORD:
+                secret: taiga-secret
+                key: postgresPassword
+        - type: storage 
+          properties:
+            pvc: 
+              - name: taiga-static-data
+                mountPath: /taiga-back/static
+                resources:
+                  requests:
+                    storage: 100Mi
+              - name: taiga-media-data
+                mountPath: /taiga-back/media
+                resources:
+                  requests:
+                    storage: 100Mi
+    - name: taiga-events-rabbitmq
+      type: webservice 
+      properties:
+        image: rabbitmq:3.8-management-alpine
+        cpu: "100m"
+        memory: "512M"
+        ports:
+          - port: 4369
+            expose: true
+          - port: 5671
+            expose: true
+          - port: 5672
+            expose: true
+          - port: 15671
+            expose: true
+          - port: 15672
+            expose: true
+          - port: 15691
+            expose: true
+          - port: 15692
+            expose: true
+          - port: 25672
+            expose: true
+        env:
+          - name: RABBITMQ_DEFAULT_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmqUser
+          - name: RABBITMQ_DEFAULT_VHOST
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmq_vhost
+      traits:
+        - type: service-binding 
+          properties:
+            envMappings:
+              RABBITMQ_ERLANG_COOKIE:
+                secret: taiga-secret
+                key: erlangCookie
+              RABBITMQ_DEFAULT_PASS:
+                secret: taiga-secret
+                key: rabbitmqPass
+        - type: storage 
+          properties:
+            pvc: 
+              - name: taiga-events-rabbitmq-data 
+                mountPath: /var/lib/rabbitmq
+                resources:
+                  requests:
+                    storage: 100Mi
+    - name: taiga-events
+      type: webservice
+      dependsOn: 
+        - taiga-events-rabbitmq
+      traits: 
+        - type: service-binding 
+          properties:
+            envMappings:
+              TAIGA_SECRET_KEY:
+                secret: taiga-secret
+                key: taigaSecretKey
+              RABBITMQ_PASS:
+                secret: taiga-secret
+                key: rabbitmqPass
+      properties:
+        image: taigaio/taiga-events:latest
+        cpu: "100m"
+        memory: "512M"
+        ports: 
+          - port: 8888
+            expose: true
+        env:
+          - name: RABBITMQ_USER
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: rabbitmqUser
+    - name: taiga-front
+      type: webservice 
+      properties:
+        image: taigaio/taiga-front:latest
+        cpu: "100m"
+        memory: "512M"
+        ports: 
+          - port: 80
+            expose: true 
+        env: 
+          - name: PUBLIC_REGISTER_ENABLED
+            valueFrom:
+              configMapKeyRef:
+                name: taiga-config
+                key: publicRegisterEnabledFE
+          - name: TAIGA_SCHEME 
+            valueFrom:  
+              configMapKeyRef:
+                name: taiga-config
+                key: taigaSitesScheme
+          - name: TAIGA_DOMAIN 
+            valueFrom:  
+              configMapKeyRef:
+                name: url-config
+                key: URL
+          - name: TAIGA_URL 
+            value: "$(TAIGA_SCHEME)://$(TAIGA_DOMAIN)"
+          - name: WEBSOCKETS_SCHEME 
+            valueFrom:  
+              configMapKeyRef:
+                name: taiga-config
+                key: websocketsScheme
+          - name: TAIGA_WEBSOCKETS_URL
+            value: "$(WEBSOCKETS_SCHEME)://$(TAIGA_DOMAIN)"
+          - name: TAIGA_SUBPATH
+            valueFrom:  
+              configMapKeyRef:
+                name: taiga-config
+                key: taigaSubpath
+    - name: taiga-protected 
+      type: webservice 
+      traits:
+        - type: service-binding 
+          properties:
+            envMappings:
+              SECRET_KEY:
+                secret: taiga-secret
+                key: taigaSecretKey
+      properties: 
+        image: taigaio/taiga-protected:latest
+        cpu: "100m"
+        memory: "512M"
+        ports: 
+          - port: 8003
+            expose: true
+        env: 
+          - name: MAX_AGE 
+            valueFrom:  
+              configMapKeyRef:
+                name: taiga-config
+                key: max_age
+

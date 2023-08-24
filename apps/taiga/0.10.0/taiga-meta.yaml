@@ -1,0 +1,19 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+# Name of the application, not necessarily a valid k8s name.
+name: "Taiga - Prod"
+version: 0.10.0
+description: Taiga is an open-source, agile project management software
+# Keywords facilitate searches on the catalog
+keywords:
+  - "agile"
+  - "infra"
+  - "project management" 
+license: "Apache License Version 2.0"
+url: "https://www.taiga.io/"
+doc: "https://community.taiga.io/t/taiga-30min-setup/170"
+
+logo:
+  - src: "https://images.g2crowd.com/uploads/product/image/social_landscape/social_landscape_807cb7fa95fa7c14a21cf1c376468954/taiga-agile-llc-taiga.png"
+    type: "image/png"
+    size: "600x315"
