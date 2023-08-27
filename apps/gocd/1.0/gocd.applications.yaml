@@ -1,0 +1,77 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application 
+metadata:
+  name: gocd-application
+spec:
+  components:
+    - name: gocd-application
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: v1
+            kind: Secret
+            metadata:
+              name: gocd-secret
+            type: Opaque
+            data:
+              password.properties: |
+               c2FtbXk6JDJ5JDA1JEx5UGlGVENPTnM0cjRpYThtSXZsSC5BbUpnQnlCM29qcnFjcm9vTGJTcTZTYlR1MVh2SmRD
+
+          - apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: gocd-config
+            data:
+              cruise-config.xml: |
+                <?xml version="1.0" encoding="utf-8"?>
+                <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="139">
+                <server agentAutoRegisterKey="agent-autoregister-key" webhookSecret="8e8402e3-6c65-4aac-9ba2-c6840912cd2d" serverId="c08140e6-e559-4604-a679-11abeab17c6a" tokenGenerationKey="17aa9df7-3b5d-4cbc-87b1-e7696e492005">
+                    <security>
+                    <authConfigs>
+                        <authConfig id="check-password" pluginId="cd.go.authentication.passwordfile">
+                        <property>
+                            <key>PasswordFilePath</key>
+                            <value>/godata/config/password.properties</value>
+                        </property>
+                        </authConfig>
+                    </authConfigs>
+                    </security>
+                    <artifacts>
+                    <artifactsDir>artifacts</artifactsDir>
+                    </artifacts>
+                </server>
+                </cruise>              
+  
+    - name: gocd-server
+      type: webservice
+      properties:
+        image: gocd/gocd-server:v23.3.0
+        ports:
+          - port: 8153
+            expose: true
+        cmd: ["/bin/bash",  "-c", "ls /config/ && mkdir -p /godata/config && cp /config/cruise-config.xml /godata/config && cp /secrets/password.properties /godata/config && /docker-entrypoint.sh"]
+     
+      traits:
+        - type: napptive-ingress
+          properties:
+            name: gocd
+            port: 8153
+            path: /
+        - type: storage
+          properties:
+            configMap:
+              - name: gocd-config
+                mountPath: /config/
+            secret:
+              - name: gocd-secret
+                mountPath: /secrets/
+      
+    - name: gocd-agent
+      type: webservice
+      properties:
+        image: gocd/gocd-agent-ubuntu-20.04:v23.3.0
+        env:
+          - name: GO_SERVER_URL
+            value: "http://gocd-server:8153/go" # Assuming SERVICE_HOST is defined
+      dependsOn:
+        - gocd-server
