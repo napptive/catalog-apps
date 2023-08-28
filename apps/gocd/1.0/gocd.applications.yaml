@@ -15,7 +15,7 @@ spec:
             type: Opaque
             data:
               password.properties: |
-               c2FtbXk6JDJ5JDA1JEx5UGlGVENPTnM0cjRpYThtSXZsSC5BbUpnQnlCM29qcnFjcm9vTGJTcTZTYlR1MVh2SmRD
+               YWRtaW46JDJ5JDA1JGFRbHBSc0tYLmI4N01UMnRDbWNiMGU0V3Z1ZkphRWJnMUM2aFJkWjA4dXZ1V1h0VEJNMUFh
 
           - apiVersion: v1
             kind: ConfigMap
