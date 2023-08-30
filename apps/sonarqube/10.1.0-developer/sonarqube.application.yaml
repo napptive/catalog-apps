@@ -3,16 +3,16 @@ kind: Application
 metadata:
   name: sonarqube
   annotations:
-    version: latest
+    version: 10.1.0-developer
     description: "sonarqube. Automatic code review tool"
 spec:
   components:
     - name: sonarqube
       type: webservice
       properties:
-        image: sonarqube:developer
+        image: sonarqube:10.1.0-developer
         cpu: "500m" 
-        memory: 1Gi
+        memory: 2Gi
         ports:
           - port: 9000
             expose: true
