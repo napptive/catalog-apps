@@ -20,7 +20,7 @@ Use _admin/admin_ credentials to log in to the application and follow the instru
 
 ## NOTE
 
-This application should be used for evaluation purpose only, the image uses an embedded H2 database and there is no persistent storage defined.
+_This application should be used for evaluation purpose only, the image uses an embedded H2 database and there is no persistent storage defined._
 
 ## References
 
