@@ -47,7 +47,7 @@ spec:
                   requests:
                     storage: 1Gi
       properties:
-        image: nimish8/vscode-server
+        image: napptive/vscode-server
         cpu: "500m"
         memory: 2G
         ports: 
