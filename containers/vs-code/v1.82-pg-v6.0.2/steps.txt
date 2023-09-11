@@ -1,5 +1,5 @@
 1. Build dockerfile
-docker build -t nimish8/vscode-server .  
+docker build -t <username>/vscode-server .  
 
 2. Upload dockerfile
 docker push nimish8/vscode-server
