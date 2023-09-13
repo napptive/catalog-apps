@@ -47,7 +47,7 @@ spec:
                   requests:
                     storage: 1Gi
       properties:
-        image: napptive/vscode-server
+        image: napptive/vscode-server:v1.82-pg-v6.0.2
         cpu: "500m"
         memory: 2G
         ports: 
