@@ -1,0 +1,86 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application 
+metadata:
+  name: vscode-playground
+  annotations:
+    version: playground
+    description: "VSCode IDE with Playground CLI"
+spec:
+  components:
+    - name: vscode-configurations
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: v1 
+            kind: Secret
+            metadata:
+              name: vscode-secrets
+            type: Opaque
+            data:
+              password: cGFzc3dvcmQ=
+              sudoPass: c3VwZXJzZWNyZXRwYXNzd29yZA==
+          - apiVersion: v1 
+            kind: ConfigMap 
+            metadata:
+              name: vscode-configs 
+            data: 
+              PUID: "1000"
+              PGID: "1000"
+              TZ: "Asia/Kolkata"
+              DEFAULT_WORKSPACE: "/config/workspace"
+    - name: vscode-playground 
+      dependsOn:
+        - vscode-configurations
+      type: webservice
+      traits:
+        - type: napptive-ingress
+          properties:
+            name: vscode 
+            port: 8443 
+            path: /
+        - type: storage
+          properties:
+            pvc:
+              - name: vscode-pvc
+                mountPath: /config
+                resources:
+                  requests:
+                    storage: 1Gi
+      properties:
+        image: napptive/vscode-server:v1.82-pg-v6.0.2
+        cpu: "500m"
+        memory: 2G
+        ports: 
+          - port: 8443
+            expose: true 
+        env:
+          - name: PUID
+            valueFrom:
+              configMapKeyRef:
+                name: vscode-configs
+                key: PUID
+          - name: PGID
+            valueFrom:
+              configMapKeyRef:
+                name: vscode-configs
+                key: PGID
+          - name: TZ
+            valueFrom:  
+              configMapKeyRef:
+                name: vscode-configs
+                key: TZ
+          - name: DEFAULT_WORKSPACE
+            valueFrom:
+              configMapKeyRef:
+                name: vscode-configs
+                key: DEFAULT_WORKSPACE
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: vscode-secrets
+                key: password
+          - name: SUDO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: vscode-secrets
+                key: sudoPass
