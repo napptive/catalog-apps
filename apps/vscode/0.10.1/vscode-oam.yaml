@@ -35,7 +35,7 @@ spec:
       traits:
         - type: napptive-ingress
           properties:
-            name: nginx-ingress 
+            name: vscode 
             port: 8443 
             path: /
         - type: storage
