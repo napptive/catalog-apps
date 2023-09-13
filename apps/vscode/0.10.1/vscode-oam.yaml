@@ -28,7 +28,7 @@ spec:
               PGID: "1000"
               TZ: "Asia/Kolkata"
               DEFAULT_WORKSPACE: "/config/workspace"
-    - name: vsocde-playground 
+    - name: vscode-playground 
       dependsOn:
         - vscode-configurations
       type: webservice
