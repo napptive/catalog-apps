@@ -25,7 +25,7 @@ spec:
               cruise-config.xml: |
                 <?xml version="1.0" encoding="utf-8"?>
                 <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="139">
-                <server agentAutoRegisterKey="agent-autoregister-key" webhookSecret="8e8402e3-6c65-4aac-9ba2-c6840912cd2d" serverId="c08140e6-e559-4604-a679-11abeab17c6a" tokenGenerationKey="17aa9df7-3b5d-4cbc-87b1-e7696e492005">
+                <server agentAutoRegisterKey="0e318c71-1449-41da-a40d-ea45d785d6d9" webhookSecret="a708b484-0e03-4988-a80f-ed8572071d42" serverId="258eb178-c2a1-400d-bcbc-51f19cbc4a8c" tokenGenerationKey="05b312f2-1d89-4d36-ad28-129100dc57e8">
                     <security>
                     <authConfigs>
                         <authConfig id="check-password" pluginId="cd.go.authentication.passwordfile">
@@ -40,7 +40,15 @@ spec:
                     <artifactsDir>artifacts</artifactsDir>
                     </artifacts>
                 </server>
-                </cruise>              
+                </cruise>  
+
+          # - apiVersion: v1
+          #   kind: ConfigMap
+          #   metadata:
+          #     name: gocd-config-check
+          #   data:
+          #     autoregister.properties: |
+          #         agent.auto.register.key="0e318c71-1449-41da-a40d-ea45d785d6d9"
   
     - name: gocd-server
       type: webservice
@@ -69,9 +77,14 @@ spec:
     - name: gocd-agent
       type: webservice
       properties:
-        image: gocd/gocd-agent-ubuntu-20.04:v23.3.0
+        image: nimish8/gocd-agent-ubuntu
+     
         env:
           - name: GO_SERVER_URL
             value: "http://gocd-server:8153/go" # Assuming SERVICE_HOST is defined
+          - name: AGENT_AUTO_REGISTER_KEY
+            value: 0e318c71-1449-41da-a40d-ea45d785d6d9
       dependsOn:
         - gocd-server
+
+      
