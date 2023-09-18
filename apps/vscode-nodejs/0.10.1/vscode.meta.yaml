@@ -1,7 +1,7 @@
 apiVersion: core.napptive.com/v1alpha1
 kind: ApplicationMetadata
 # Name of the application, not necessarily a valid k8s name.
-name: "VSCode - Playground"
+name: "VSCode - NodeJS"
 version: 0.10.1
 description: VSCode is a fully flexible open-source code-editor.
 # Keywords facilitate searches on the catalog

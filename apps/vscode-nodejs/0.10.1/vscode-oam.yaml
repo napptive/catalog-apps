@@ -1,7 +1,7 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application 
 metadata:
-  name: vscode-playground
+  name: vscode-nodejs
   annotations:
     version: playground
     description: "VSCode IDE with Playground CLI"
@@ -25,7 +25,7 @@ spec:
             data: 
               PUID: "1000"
               PGID: "1000"
-    - name: vscode-playground 
+    - name: vscode-nodejs 
       dependsOn:
         - vscode-configurations
       type: webservice
