@@ -28,14 +28,14 @@ spec:
               PGID: "1000"
               TZ: "Asia/Kolkata"
               DEFAULT_WORKSPACE: "/config/workspace"
-    - name: vscode-playground 
+    - name: vsocde-playground 
       dependsOn:
         - vscode-configurations
       type: webservice
       traits:
         - type: napptive-ingress
           properties:
-            name: vscode 
+            name: nginx-ingress 
             port: 8443 
             path: /
         - type: storage
