@@ -25,7 +25,7 @@ spec:
             data: 
               PUID: "1000"
               PGID: "1000"
-    - name: vsocde-playground 
+    - name: vscode-playground 
       dependsOn:
         - vscode-configurations
       type: webservice
@@ -33,7 +33,7 @@ spec:
         - type: playground-injector
         - type: napptive-ingress
           properties:
-            name: nginx-ingress 
+            name: vscode 
             port: 8080 
             path: /
         - type: storage
