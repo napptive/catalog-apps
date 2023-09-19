@@ -1,11 +1,8 @@
-FROM lscr.io/linuxserver/code-server:latest
+FROM codercom/code-server:4.9.1
 
 USER root 
 
-# Install playground-CLI
-RUN curl -O https://storage.googleapis.com/artifacts.playground.napptive.dev/installer.sh && bash installer.sh
-
-# Install NodeJS
+# nodejs installation
 RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
     apt-get install -y nodejs \
     build-essential && \
@@ -13,9 +10,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_current.x | bash - && \
     npm --version
 
 RUN mkdir -p /extensions/code-server/extensions && chmod -R  777 /extensions
-
 RUN echo  'export XDG_DATA_HOME=/extensions' >> /etc/profile
 
-RUN useradd -ms /bin/bash coder
-
+USER coder
 ENV XDG_DATA_HOME=/extensions
+RUN code-server --install-extension eg2.vscode-npm-script

@@ -1,7 +1,7 @@
 apiVersion: core.oam.dev/v1beta1
 kind: Application 
 metadata:
-  name: vscode-playground
+  name: vscode-nodejs
   annotations:
     version: playground
     description: "VSCode IDE with Playground CLI"
@@ -18,7 +18,6 @@ spec:
             type: Opaque
             data:
               password: cGFzc3dvcmQ=
-              sudoPass: c3VwZXJzZWNyZXRwYXNzd29yZA==
           - apiVersion: v1 
             kind: ConfigMap 
             metadata:
@@ -26,17 +25,16 @@ spec:
             data: 
               PUID: "1000"
               PGID: "1000"
-              TZ: "Asia/Kolkata"
-              DEFAULT_WORKSPACE: "/config/workspace"
-    - name: vscode-playground 
+    - name: vscode-nodejs 
       dependsOn:
         - vscode-configurations
       type: webservice
       traits:
+        - type: playground-injector
         - type: napptive-ingress
           properties:
             name: vscode 
-            port: 8443 
+            port: 8080 
             path: /
         - type: storage
           properties:
@@ -47,11 +45,11 @@ spec:
                   requests:
                     storage: 1Gi
       properties:
-        image: napptive/vscode-server:v1.82-pg-v6.0.2
+        image: napptive/vscode-nodejs:latest
         cpu: "500m"
         memory: 2G
         ports: 
-          - port: 8443
+          - port: 8080
             expose: true 
         env:
           - name: PUID
@@ -64,23 +62,8 @@ spec:
               configMapKeyRef:
                 name: vscode-configs
                 key: PGID
-          - name: TZ
-            valueFrom:  
-              configMapKeyRef:
-                name: vscode-configs
-                key: TZ
-          - name: DEFAULT_WORKSPACE
-            valueFrom:
-              configMapKeyRef:
-                name: vscode-configs
-                key: DEFAULT_WORKSPACE
           - name: PASSWORD
             valueFrom:
               secretKeyRef:
                 name: vscode-secrets
                 key: password
-          - name: SUDO_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: vscode-secrets
-                key: sudoPass
