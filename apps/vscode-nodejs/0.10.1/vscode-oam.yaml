@@ -17,7 +17,7 @@ spec:
               name: vscode-secrets
             type: Opaque
             data:
-              password: cGFzc3dvcmQ
+              password: cGFzc3dvcmQ=
           - apiVersion: v1 
             kind: ConfigMap 
             metadata:
