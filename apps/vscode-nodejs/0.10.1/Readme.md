@@ -4,5 +4,5 @@ This application hosts a vscode-server on browser ready to use integrated with N
 
 Steps:
 1. Select catalog application.
-2. Change password and sudoPassword in base64 format. (default is `password`)
+2. Change password in Base64 format.
 3. Deploy the application.
