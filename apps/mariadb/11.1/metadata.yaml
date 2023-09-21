@@ -1,0 +1,14 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "MariaDB"
+version: "11.1"
+description: MariaDB Database
+keywords:
+  - "database"
+license: "Apache License Version 2.0"
+url: "https://mariadb.org/"
+doc: "https://mariadb.org/documentation/"
+logo:
+  - src: "https://storage.googleapis.com/artifacts.playground.napptive.dev/logos/mariadb/mariadb.logo.png"
+    type: "image/png"
+    size: "170x115"
