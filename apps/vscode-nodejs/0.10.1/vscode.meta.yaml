@@ -10,8 +10,8 @@ keywords:
   - "vscode"
   - "IDE" 
 license: "Apache License Version 2.0"
-url: "https://hub.docker.com/r/linuxserver/code-server"
-doc: "https://hub.docker.com/r/linuxserver/code-server"
+url: "https://hub.docker.com/r/codercom/code-server"
+doc: "https://github.com/coder/code-server"
 
 logo:
   - src: "https://e7.pngegg.com/pngimages/100/690/png-clipart-visual-studio-code-microsoft-visual-studio-source-code-text-editor-microsoft-blue-angle-thumbnail.png"
