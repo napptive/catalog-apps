@@ -1,0 +1,20 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+# Name of the application, not necessarily a valid k8s name.
+name: "VSCode - NodeJS"
+version: 0.10.1
+description: VSCode is a fully flexible open-source code-editor.
+# Keywords facilitate searches on the catalog
+keywords:
+  - "code-editor"
+  - "vscode"
+  - "IDE" 
+license: "Apache License Version 2.0"
+url: "https://hub.docker.com/r/codercom/code-server"
+doc: "https://github.com/coder/code-server"
+
+logo:
+  - src: "https://e7.pngegg.com/pngimages/100/690/png-clipart-visual-studio-code-microsoft-visual-studio-source-code-text-editor-microsoft-blue-angle-thumbnail.png"
+    type: "image/png"
+    size: "348x348"
+

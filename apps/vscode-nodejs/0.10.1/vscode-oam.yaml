@@ -1,0 +1,69 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application 
+metadata:
+  name: vscode-nodejs
+  annotations:
+    version: playground
+    description: "VSCode IDE with Playground CLI"
+spec:
+  components:
+    - name: vscode-configurations
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: v1 
+            kind: Secret
+            metadata:
+              name: vscode-secrets
+            type: Opaque
+            data:
+              password: cGFzc3dvcmQ=
+          - apiVersion: v1 
+            kind: ConfigMap 
+            metadata:
+              name: vscode-configs 
+            data: 
+              PUID: "1000"
+              PGID: "1000"
+    - name: vscode-nodejs 
+      dependsOn:
+        - vscode-configurations
+      type: webservice
+      traits:
+        - type: playground-injector
+        - type: napptive-ingress
+          properties:
+            name: vscode 
+            port: 8080 
+            path: /
+        - type: storage
+          properties:
+            pvc:
+              - name: vscode-pvc
+                mountPath: /config
+                resources:
+                  requests:
+                    storage: 1Gi
+      properties:
+        image: napptive/vscode-nodejs:latest
+        cpu: "500m"
+        memory: 2G
+        ports: 
+          - port: 8080
+            expose: true 
+        env:
+          - name: PUID
+            valueFrom:
+              configMapKeyRef:
+                name: vscode-configs
+                key: PUID
+          - name: PGID
+            valueFrom:
+              configMapKeyRef:
+                name: vscode-configs
+                key: PGID
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: vscode-secrets
+                key: password
