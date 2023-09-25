@@ -8,3 +8,9 @@ This application contains the OAM definition of GOCD and necessary configuration
 2. Select GOCD application.
 3. Replace production configurations in the ConfigMap and secrets with your own configuration (or leave as default).
 4. Deploy app.
+
+## Defatult values
+
+* *User*: admin
+* *Password*: gocdnapptive
+ 

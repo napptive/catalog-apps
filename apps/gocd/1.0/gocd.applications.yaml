@@ -77,7 +77,7 @@ spec:
     - name: gocd-agent
       type: webservice
       properties:
-        image: nimish8/gocd-agent-ubuntu
+        image: napptive/gocd-agent-ubuntu-pg:latest
      
         env:
           - name: GO_SERVER_URL
