@@ -1,0 +1,24 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+# Name of the application, not necessarily a valid k8s name.
+name: "gocd-prod"
+# Version of the application, typically related with the components versions.
+version: 1.0
+description: Free and Open source CI/CD server
+# Keywords facilitate searches on the catalog
+keywords:
+  - "ci/cd"
+  - "integration tests"
+  - "gitlab"
+  - "unit tests"
+# Set the license based on the components that are deployed in an application.
+license: "Apache License Version 2.0"
+# URL and Doc entries with links to get more information on the application and its associated documentation.
+url: "https://www.gocd.org/index.html"
+doc: "https://docs.gocd.org/current/"
+# The logo can be used as visual information when listing the catalog so the user
+# recognizes more easily the application. Avoid hotlinking images without permission.
+logo:
+  - src: "https://avatars.githubusercontent.com/u/6099846?s=200&v=4"
+    type: "image/png"
+    size: "600x315"
