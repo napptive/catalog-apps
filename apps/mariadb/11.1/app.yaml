@@ -1,0 +1,64 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: mariadb
+  annotations:
+    version: 1.40.0
+spec:
+  components:
+    - name: mariadb-entities
+      type: k8s-objects # Set to k8s-objects
+      properties:
+        objects:
+          # set the k8s manifest
+          # Secret
+          - apiVersion: v1
+            kind: Secret
+            metadata:
+              name: mariadb-secret
+            type: Opaque
+            data:
+              MARIADB_USER: bWFyaWFkYnVzZXI=
+              MARIADB_PASSWORD: cGFzc3dvcmQ=
+              MARIADB_ROOT_PASSWORD: cGFzc3dvcmQ=
+          # ConfigMap
+          - apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: mariadb-cm
+            data:
+              MARIADB_DATABASE: db
+    - name: mariadb
+      type: webservice
+      dependsOn:
+        - mariadb-entities
+      properties:
+        image: mariadb:11.1
+        cpu: "150m"
+        memory: 256Mi
+        ports:
+          - port: 3306
+            expose: true
+      # Uncomment this for ephemeral volume
+      #        volumeMounts:
+      #          emptyDir:
+      #            - name: data
+      #              mountPath: "/var/lib/mysql"
+      # PVC. Comment the trait if your have no PV allowed
+      traits:
+        - type: storage
+          properties:
+            pvc:
+              - name: pvc-test
+                mountOnly: false
+                mountPath: "/var/lib/mysql"
+                resources:
+                  requests:
+                    storage: 500Mi
+        - type: env-from
+          properties:
+            configmapName:
+              - mariadb-cm
+            secretName:
+              - mariadb-secret
+
