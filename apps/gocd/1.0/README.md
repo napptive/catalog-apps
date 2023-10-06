@@ -1,4 +1,4 @@
-# GOGS - Free and Open source CI/CD server
+# GoCD - Free and Open source CI/CD server
 
 This application contains the OAM definition of GOCD and necessary configurations to deploy them into production at Napptive.
 
