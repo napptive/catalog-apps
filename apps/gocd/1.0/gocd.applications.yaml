@@ -4,52 +4,7 @@ metadata:
   name: gocd-application
 spec:
   components:
-    - name: gocd-application
-      type: k8s-objects
-      properties:
-        objects:
-          - apiVersion: v1
-            kind: Secret
-            metadata:
-              name: gocd-secret
-            type: Opaque
-            data:
-              password.properties: |
-               YWRtaW46JDJ5JDA1JGFRbHBSc0tYLmI4N01UMnRDbWNiMGU0V3Z1ZkphRWJnMUM2aFJkWjA4dXZ1V1h0VEJNMUFh
 
-          - apiVersion: v1
-            kind: ConfigMap
-            metadata:
-              name: gocd-config
-            data:
-              cruise-config.xml: |
-                <?xml version="1.0" encoding="utf-8"?>
-                <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="139">
-                <server agentAutoRegisterKey="0e318c71-1449-41da-a40d-ea45d785d6d9" webhookSecret="a708b484-0e03-4988-a80f-ed8572071d42" serverId="258eb178-c2a1-400d-bcbc-51f19cbc4a8c" tokenGenerationKey="05b312f2-1d89-4d36-ad28-129100dc57e8">
-                    <security>
-                    <authConfigs>
-                        <authConfig id="check-password" pluginId="cd.go.authentication.passwordfile">
-                        <property>
-                            <key>PasswordFilePath</key>
-                            <value>/godata/config/password.properties</value>
-                        </property>
-                        </authConfig>
-                    </authConfigs>
-                    </security>
-                    <artifacts>
-                    <artifactsDir>artifacts</artifactsDir>
-                    </artifacts>
-                </server>
-                </cruise>  
-
-          # - apiVersion: v1
-          #   kind: ConfigMap
-          #   metadata:
-          #     name: gocd-config-check
-          #   data:
-          #     autoregister.properties: |
-          #         agent.auto.register.key="0e318c71-1449-41da-a40d-ea45d785d6d9"
-  
     - name: gocd-server
       type: webservice
       properties:
@@ -87,4 +42,40 @@ spec:
       dependsOn:
         - gocd-server
 
-      
+    - name: gocd-application
+      type: k8s-objects
+      properties:
+        objects:
+          - apiVersion: v1
+            kind: Secret
+            metadata:
+              name: gocd-secret
+            type: Opaque
+            data:
+              password.properties: |
+                YWRtaW46JDJ5JDA1JGFRbHBSc0tYLmI4N01UMnRDbWNiMGU0V3Z1ZkphRWJnMUM2aFJkWjA4dXZ1V1h0VEJNMUFh
+
+          - apiVersion: v1
+            kind: ConfigMap
+            metadata:
+              name: gocd-config
+            data:
+              cruise-config.xml: |
+                <?xml version="1.0" encoding="utf-8"?>
+                <cruise xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="cruise-config.xsd" schemaVersion="139">
+                <server agentAutoRegisterKey="0e318c71-1449-41da-a40d-ea45d785d6d9" webhookSecret="a708b484-0e03-4988-a80f-ed8572071d42" serverId="258eb178-c2a1-400d-bcbc-51f19cbc4a8c" tokenGenerationKey="05b312f2-1d89-4d36-ad28-129100dc57e8">
+                    <security>
+                    <authConfigs>
+                        <authConfig id="check-password" pluginId="cd.go.authentication.passwordfile">
+                        <property>
+                            <key>PasswordFilePath</key>
+                            <value>/godata/config/password.properties</value>
+                        </property>
+                        </authConfig>
+                    </authConfigs>
+                    </security>
+                    <artifacts>
+                    <artifactsDir>artifacts</artifactsDir>
+                    </artifacts>
+                </server>
+                </cruise>
