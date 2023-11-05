@@ -1,0 +1,143 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: penpot-deployment
+spec:
+  components:
+    - name: penpot-frontend
+      dependsOn:
+        - penpot-backend
+        - penpot-exporter
+      type: webservice
+      properties:
+        image: penpotapp/frontend:latest
+        cpu: "50m"
+        memory: "512M"
+        ports:
+          - port: 80
+            expose: true
+        env:
+          - name: PENPOT_FLAGS
+            value: enable-registration enable-login-with-password disable-email-verification disable-smtp enable-log-emails
+      traits:
+        - type: napptive-ingress
+          properties:
+            name: penpot-ingress
+            port: 80
+            path: /
+        - type: storage
+          properties:
+            pvc:
+              - name: penpot-frontend-pvc
+                mountPath: /opt/data
+                resources:
+                  requests:
+                    storage: 1Gi
+    - name: penpot-backend
+      dependsOn:
+        - penpot-postgres
+        - penpot-redis
+      type: webservice
+      traits:
+        - type: storage
+          properties:
+            pvc:
+              - name: penpot-backend-pvc
+                mountPath: /opt/data
+                resources:
+                  requests:
+                    storage: 1Gi
+      properties:
+        image: penpotapp/backend:latest
+        cpu: "200m"
+        memory: "2Gi"
+        ports:
+          - port: 6060
+            expose: true
+        env:
+          - name: PENPOT_FLAGS
+            value: enable-registration enable-login-with-password disable-email-verification disable-smtp enable-log-emails
+          - name: PENPOT_PUBLIC_URI
+            value: http://penpot-frontend
+          - name: PENPOT_DATABASE_URI
+            value: postgresql://penpot-postgres/penpot
+          - name: PENPOT_DATABASE_USERNAME
+            value: penpot
+          - name: PENPOT_DATABASE_PASSWORD
+            value: penpot
+          - name: PENPOT_REDIS_URI
+            value: redis://penpot-redis/0
+          - name: PENPOT_ASSETS_STORAGE_BACKEND
+            value: assets-fs
+          - name: PENPOT_STORAGE_ASSETS_FS_DIRECTORY
+            value: /opt/data/assets
+          - name: PENPOT_TELEMETRY_ENABLED
+            value: "false"
+          # penpot SMTP Settings
+          # - name: PENPOT_SMTP_DEFAULT_FROM
+          #   value: no-reply@example.com
+          # - name: PENPOT_SMTP_DEFAULT_REPLY_TO
+          #   value: no-reply@example.com
+          # - name: PENPOT_SMTP_HOST
+          #   value: penpot-mailcatch
+          # - name: PENPOT_SMTP_PORT
+          #   value: 1025
+          # - name: PENPOT_SMTP_USERNAME
+          #   value: ""
+          # - name: PENPOT_SMTP_PASSWORD
+          #   value: ""
+          # - name: PENPOT_SMTP_TLS
+          #   value: false
+          # - name: PENPOT_SMTP_SSL
+          #   value: false
+    - name: penpot-exporter
+      type: webservice
+      properties:
+        image: "penpotapp/exporter:latest"
+        ports:  
+          - port: 6061
+            expose: true
+        env:
+          - name: PENPOT_REDIS_URI
+            value: redis://penpot-redis/0
+          - name: PENPOT_PUBLIC_URI
+            value: http://penpot-frontend
+    - name: penpot-postgres
+      dependsOn:
+        - penpot-redis
+      type: webservice
+      traits:
+        - type: storage
+          properties:
+            pvc:
+              - name: penpot-postgres-pvc
+                mountPath: /var/lib/postgresql/data
+                subPath: postgres
+                resources:
+                  requests:
+                    storage: 1Gi
+      properties:
+        image: "postgres:15"
+        cpu: "50m"
+        memory: "512M"
+        ports:
+          - port: 5432
+            expose: true
+        env:
+          - name: POSTGRES_INITDB_ARGS
+            value: --data-checksums
+          - name: POSTGRES_DB
+            value: penpot
+          - name: POSTGRES_USER
+            value: penpot
+          - name: POSTGRES_PASSWORD
+            value: penpot
+    - name: penpot-redis
+      type: webservice
+      properties:
+        image: "redis:7"
+        cpu: "50m"
+        memory: "512M"
+        ports:
+          - port: 6379
+            expose: true

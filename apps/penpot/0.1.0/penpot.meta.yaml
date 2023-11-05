@@ -1,0 +1,19 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+# Name of the application, not necessarily a valid k8s name.
+name: "Penpot Design Tool"
+version: 0.1.0
+description: Penpot Design Tool
+# Keywords facilitate searches on the catalog
+keywords:
+  - "design tool"
+  - "penpot"
+  - "ui/ux"
+license: "Apache License Version 2.0"
+url: "https://penpot.app/"
+doc: "https://help.penpot.app/technical-guide/getting-started/#install-with-docker"
+
+logo:
+  - src: "https://static-00.iconduck.com/assets.00/penpot-icon-408x512-dwt4p7sy.png"
+    type: "image/png"
+    size: "408x512"
