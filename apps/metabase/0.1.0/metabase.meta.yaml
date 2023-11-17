@@ -1,0 +1,19 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+# Name of the application, not necessarily a valid k8s name.
+name: "Metabase"
+version: 0.1.0
+description: Metabase Design Tool
+# Keywords facilitate searches on the catalog
+keywords:
+  - "analytics tool"
+  - "metabase"
+  - "business"
+license: "Apache License Version 2.0"
+url: "https://www.metabase.com"
+doc: "https://www.metabase.com/docs/latest/"
+
+logo:
+  - src: "https://support.datawarehouse.io/hc/article_attachments/14367482768275"
+    type: "image/png"
+    size: "1000x1000"
