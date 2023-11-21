@@ -1,0 +1,92 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: metabase-deployment
+spec:
+  components:
+    - name: metabase
+      dependsOn:
+        - metabase-db
+      type: webservice
+      properties:
+        image: metabase/metabase
+        cpu: "250m"
+        memory: "3Gi"
+        ports:
+          - port: 3000
+            expose: true
+        env:
+          - name: MB_DB_TYPE
+            value: postgres
+          - name: MB_DB_DBNAME
+            value: metabasedb
+          - name: MB_DB_PORT
+            value: "5432"
+          - name: MB_DB_USER
+            value: metabase
+          - name: MB_DB_PASS
+            value: metabase
+          - name: MB_DB_HOST
+            value: metabase-db
+      traits:
+        - type: napptive-ingress
+          properties:
+            name: metabase-ingress
+            port: 3000
+            path: /
+    - name: metabase-db
+      type: webservice
+      traits:
+        - type: storage
+          properties:
+            pvc:
+              - name: penpot-postgres-pvc
+                mountPath: /var/lib/postgresql/data
+                subPath: postgres
+                resources:
+                  requests:
+                    storage: 1Gi
+      properties:
+        image: "postgres:15"
+        cpu: "50m"
+        memory: "512M"
+        ports:
+          - port: 5432
+            expose: true
+        env:
+          - name: POSTGRES_INITDB_ARGS
+            value: --data-checksums
+          - name: POSTGRES_DB
+            value: metabasedb
+          - name: POSTGRES_USER
+            value: metabase
+          - name: POSTGRES_PASSWORD
+            value: metabase
+    - name: metabase-test-db
+      type: webservice
+      traits:
+        - type: storage
+          properties:
+            pvc:
+              - name: penpot-postgres-test-pvc
+                mountPath: /var/lib/postgresql/data
+                subPath: postgres
+                resources:
+                  requests:
+                    storage: 1Gi
+      properties:
+        image: "postgres:15"
+        cpu: "50m"
+        memory: "512M"
+        ports:
+          - port: 5432
+            expose: true
+        env:
+          - name: POSTGRES_INITDB_ARGS
+            value: --data-checksums
+          - name: POSTGRES_DB
+            value: metabase_test_db
+          - name: POSTGRES_USER
+            value: metabase
+          - name: POSTGRES_PASSWORD
+            value: metabase
