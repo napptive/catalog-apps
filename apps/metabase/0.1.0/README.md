@@ -4,8 +4,16 @@ This OAM application hosts Metabase Analytics Tool on Napptive with minimal conf
 
 Resources Requirement: 
 - CPU: 1vCPU
-- RAM: 4GB
+- RAM: 3GB
 - Storage: 3GB (can be modified)
+
+Basic Database credentials: (Please change the values)
+
+- Host: metabase-test-db
+- Port: 5432
+- Database Name: metabase_test_db
+- Username: metabase
+- Password: metabase
 
 Steps: 
 1. Select application from catalog. 
