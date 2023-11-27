@@ -40,7 +40,7 @@ spec:
         - type: storage
           properties:
             pvc:
-              - name: penpot-postgres-pvc
+              - name: postgres-pvc
                 mountPath: /var/lib/postgresql/data
                 subPath: postgres
                 resources:
@@ -68,7 +68,7 @@ spec:
         - type: storage
           properties:
             pvc:
-              - name: penpot-postgres-test-pvc
+              - name: postgres-test-pvc
                 mountPath: /var/lib/postgresql/data
                 subPath: postgres
                 resources:
