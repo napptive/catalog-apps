@@ -1,0 +1,18 @@
+apiVersion: core.napptive.com/v1alpha1
+kind: ApplicationMetadata
+name: "OnlyOfficeDocs"
+version: 0.1.0
+description: Open source document editing tool
+keywords:
+  - "document editing tool"
+  - "docx"
+  - "ppt"
+  - "csv"
+license: "Apache License Version 2.0"
+url: "https://www.onlyoffice.com/"
+doc: "https://helpcenter.onlyoffice.com/installation/docs-community-install-docker.aspx"
+
+logo:
+  - src: "https://download.onlyoffice.com/assets/fb/fb_icon_325x325.jpg"
+    type: "image/jpg"
+    size: "325x325"
