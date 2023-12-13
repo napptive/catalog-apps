@@ -31,6 +31,14 @@ spec:
             value: onlyoffice
           - name: AMQP_URI
             value: amqp://guest:guest@onlyoffice-rabbitmq
+          - name: JWT_ENABLED
+            value: "true"
+          - name: JWT_SECRET
+            value: "my-secret"
+          - name: JWT_HEADER
+            value: Authorization
+          - name: JWT_IN_BODY
+            value: "true"
       traits:
         - type: lifecycle
           properties:
