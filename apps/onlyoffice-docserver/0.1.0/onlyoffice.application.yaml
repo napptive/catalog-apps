@@ -1,0 +1,116 @@
+apiVersion: core.oam.dev/v1beta1
+kind: Application
+metadata:
+  name: onlyoffice-deployment
+spec:
+  components:
+    - name: onlyoffice-documentserver
+      dependsOn:
+        - onlyoffice-db
+        - onlyoffice-rabbitmq
+      type: webservice
+      properties:
+        image: onlyoffice/documentserver
+        cpu: "1"
+        memory: "4Gi"
+        ports:
+          - port: 80
+            expose: true
+          - port: 443
+            expose: true
+        env:
+          - name: DB_TYPE
+            value: postgres
+          - name: DB_HOST
+            value: onlyoffice-db
+          - name: DB_PORT
+            value: "5432"
+          - name: DB_NAME
+            value: onlyofficedb
+          - name: DB_USER
+            value: onlyoffice
+          - name: AMQP_URI
+            value: amqp://guest:guest@onlyoffice-rabbitmq
+          - name: JWT_ENABLED
+            value: "true"
+          - name: JWT_SECRET
+            value: "my-secret"
+          - name: JWT_HEADER
+            value: Authorization
+          - name: JWT_IN_BODY
+            value: "true"
+      traits:
+        - type: lifecycle
+          properties:
+            postStart:
+              exec:
+                command:
+                  [
+                    "/bin/bash",
+                    "-c",
+                    "sleep 30 && sudo supervisorctl start ds:example && sudo sed 's,autostart=false,autostart=true,' -i /etc/supervisor/conf.d/ds-example.conf",
+                  ]
+        - type: napptive-ingress
+          properties:
+            name: onlyoffice-ingress
+            port: 80
+            path: /
+        - type: storage
+          properties:
+            pvc:
+              - name: office-log-pvc
+                mountPath: /var/log/onlyoffice
+                resources:
+                  requests:
+                    storage: 512Mi
+              - name: office-data-pvc
+                mountPath: /var/www/onlyoffice/Data
+                resources:
+                  requests:
+                    storage: 1Gi
+              - name: officelib
+                mountPath: /var/lib/onlyoffice
+                resources:
+                  requests:
+                    storage: 256Mi
+              - name: office-font
+                mountPath: /usr/share/fonts
+                resources:
+                  requests:
+                    storage: 100Mi
+    - name: onlyoffice-rabbitmq
+      type: webservice
+      properties:
+        image: rabbitmq
+        cpu: "150m"
+        memory: "1Gi"
+        ports:
+          - port: 5672
+            expose: true
+
+    - name: onlyoffice-db
+      type: webservice
+      properties:
+        image: "postgres:9.5"
+        cpu: "250m"
+        memory: "1Gi"
+        ports:
+          - port: 5432
+            expose: true
+        env:
+          - name: POSTGRES_DB
+            value: onlyofficedb
+          - name: POSTGRES_USER
+            value: onlyoffice
+          - name: POSTGRES_HOST_AUTH_METHOD
+            value: trust
+      traits:
+        - type: storage
+          properties:
+            pvc:
+              - name: postgres-db-pvc
+                mountPath: /var/lib/postgresql/data
+                subPath: postgres
+                resources:
+                  requests:
+                    storage: 1Gi
