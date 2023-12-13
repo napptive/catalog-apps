@@ -1,11 +1,11 @@
 # OnlyOffice Suite
 
-This OAM application hosts OnlyOffice Suite on Napptive with minimal configuration.
+This OAM application hosts OnlyOffice Suite Document Server on Napptive with minimal configuration.
 
 Resources Requirement: 
-- CPU: 1vCPU
-- RAM: 5GB
-- Storage: 3GB (can be modified)
+- CPU: 2vCPU
+- RAM: 7GB
+- Storage: 4GB (can be modified)
 
 Steps: 
 1. Select application from catalog. 
