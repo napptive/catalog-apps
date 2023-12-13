@@ -14,4 +14,4 @@ Steps:
 4. Open the OnlyOffice URL and start example.
 5. Start using the application.
  
-NOTE: Backend application requires at-least 5 minutes to start
+NOTE: This OAM file hosts Document Server of OnlyOffice and is required to be integrated using OnlyOffice Groups.
